@@ -1,0 +1,11 @@
+LINKS EXTERNOS - MARIA JOSE PEREIRA
+Sprint 1 - Playwright - Grupo 2
+
+Video de evidencia (Drive):
+https://drive.google.com/file/d/1UkvKh64xJa8bZ6UzhtdItGpSBgZbAVHM/view?usp=drive_link
+
+Documento de evidencias (Word en Drive):
+https://docs.google.com/document/d/1JI4LUBuUtPRrH2CgAbpnip-sOnl92Tcu/edit?usp=drive_link&ouid=100508837654975150017&rtpof=true&sd=true
+
+Repositorio del proyecto:
+https://github.com/Elizabeth5371/plan-hogar-test

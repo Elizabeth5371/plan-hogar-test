@@ -33,6 +33,7 @@ export default defineConfig({
 
     /* Video de cada test — buena evidencia para la carpeta de entregables */
     video: 'on',
+    launchOptions: {slowMo: 600}, // Opcional: ralentiza la ejecución para ver mejor lo que pasa
   },
 
   /* Navegadores contra los que se ejecutan los tests */

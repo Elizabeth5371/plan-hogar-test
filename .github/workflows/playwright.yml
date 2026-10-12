@@ -1,27 +1,105 @@
 name: Playwright Tests
+
 on:
   push:
-    branches: [ main, master ]
+    branches: [main]
   pull_request:
-    branches: [ main, master ]
+    branches: [main]
+  workflow_dispatch:
+
 jobs:
   test:
-    timeout-minutes: 60
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: developer
+          MYSQL_DATABASE: combos_empresaAvalos
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -pdevsoft"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-    - name: Install dependencies
-      run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
-    - name: Run Playwright tests
-      run: npx playwright test
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+      - name: Checkout repo de tests
+        uses: actions/checkout@v4
+
+      - name: Checkout repo de la app (privado)
+        uses: actions/checkout@v4
+        with:
+          repository: Elizabeth5371/ProyectoGestorVentaPH
+          token: ${{ secrets.APP_REPO_TOKEN }}
+          path: app
+
+      - name: Instalar cliente MySQL
+        run: sudo apt-get update && sudo apt-get install -y mysql-client
+
+      - name: Importar dump a MySQL
+        run: |
+          mysql -h 127.0.0.1 -uroot -pdevsoft combos_empresaAvalos < app/Dump20261005.sql
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Levantar la app en segundo plano
+        working-directory: app
+        env:
+          ASPNETCORE_URLS: https://localhost:7250
+          ConnectionStrings__DefaultConnection: "Server=127.0.0.1;Port=3306;Database=combos_empresaAvalos;User=root;Password=developer;Connection Timeout=30;"
+          EmailSettings__AppPassword: "dummy-no-enviar"
+        run: |
+          dotnet dev-certs https
+          nohup dotnet run --no-launch-profile > ../app.log 2>&1 &
+
+      - name: Esperar que la app responda
+        run: |
+          for i in {1..40}; do
+            if curl -k -s -o /dev/null https://localhost:7250; then
+              echo "App lista"
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "La app no respondió. Log:"
+          cat app.log
+          exit 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Instalar browsers de Playwright
+        run: npx playwright install --with-deps
+
+      - name: Correr tests
+        run: npx playwright test
+
+      - name: Subir reporte
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+
+      - name: Subir log de la app
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-log
+          path: app.log

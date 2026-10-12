@@ -2,6 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests',
+  globalTimeout: 25 * 60_000, // 25 minutos para cada test
 
   /* Correr los tests en paralelo */
   fullyParallel: true,
@@ -16,7 +17,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
 
   /* Reporte HTML (el que se abre en localhost:9323) */
-  reporter: 'html',
+  reporter: [['list'], ['html', { open: 'never' }]],
 
   use: {
     /* URL base: permite usar rutas cortas en los tests */

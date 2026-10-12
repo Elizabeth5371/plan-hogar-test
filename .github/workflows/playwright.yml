@@ -50,14 +50,14 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Levantar la app en segundo plano
-        working-directory: app
+        working-directory: app/ProyectoGestorVentaPH
         env:
           ASPNETCORE_URLS: https://localhost:7250
           ConnectionStrings__DefaultConnection: "Server=127.0.0.1;Port=3306;Database=combos_empresaAvalos;User=root;Password=developer;Connection Timeout=30;"
           EmailSettings__AppPassword: "dummy-no-enviar"
         run: |
           dotnet dev-certs https
-          nohup dotnet run --no-launch-profile > ../app.log 2>&1 &
+          nohup dotnet run --no-launch-profile > ../../app.log 2>&1 &
 
       - name: Esperar que la app responda
         run: |

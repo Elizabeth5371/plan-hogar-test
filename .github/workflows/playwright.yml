@@ -42,7 +42,7 @@ jobs:
 
       - name: Importar dump a MySQL
         run: |
-          mysql -h 127.0.0.1 -uroot -pdevsoft combos_empresaAvalos < app/Dump20261005.sql
+          mysql -h 127.0.0.1 -uroot -pdeveloper combos_empresaAvalos < app/Dump20261005.sql
 
       - name: Setup .NET 8
         uses: actions/setup-dotnet@v4

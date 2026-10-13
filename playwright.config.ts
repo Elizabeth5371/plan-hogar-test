@@ -11,7 +11,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
 
   /* Reintentos: solo en CI */
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 1 : 0,
 
   /* Workers: uno solo en CI */
   workers: process.env.CI ? 1 : undefined,
@@ -31,10 +31,10 @@ export default defineConfig({
 
     /* Captura screenshot solo si el test falla (sirve como evidencia) */
     screenshot: 'only-on-failure',
-
-    /* Video de cada test — buena evidencia para la carpeta de entregables */
-    video: 'on',
-    launchOptions: {slowMo: 600}, // Opcional: ralentiza la ejecución para ver mejor lo que pasa
+        /* Video: en CI solo cuando el test falla; en local, siempre */
+    video: process.env.CI ? 'retain-on-failure' : 'on',
+    launchOptions: { slowMo: process.env.CI ? 0 : 100 }, // pausa solo en tu compu
+    
   },
 
   /* Navegadores contra los que se ejecutan los tests */

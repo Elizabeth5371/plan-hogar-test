@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests',
-  globalTimeout: 25 * 60_000, // 25 minutos para cada test
+  globalTimeout: 25 * 60_000, // 25 minutos para toda la suite
 
   /* Correr los tests en paralelo */
   fullyParallel: true,

@@ -35,8 +35,12 @@ test.describe('CP-004: Generación automática de 18 cuotas', () => {
     await page.locator('#Email').fill('cliente.adhesion@example.com');
     await page.locator('#Calle').fill('Av. Siempre Viva');
     await page.locator('#Numero').fill('742');
-    await page.locator('#ddlProvincia').selectOption({ label: 'Catamarca' }); // ⚠️ ajustar a tus datos reales
-    await page.waitForResponse(res => res.url().includes('/Clientes/GetLocalidades') && res.status() === 200);
+
+    await Promise.all([
+    page.waitForResponse(res => res.url().includes('/Clientes/GetLocalidades') && res.status() === 200),
+    page.locator('#ddlProvincia').selectOption({ label: 'Catamarca' }),
+  ]);
+
     await page.locator('#ddlLocalidad').selectOption({ label: 'San Fernando del Valle de Catamarca' }); // ⚠️ ajustar
     await page.locator('#ConsentimientoDatos').check();
     await page.locator('button[type="submit"]', { hasText: 'Guardar' }).click();

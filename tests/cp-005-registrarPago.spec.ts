@@ -41,8 +41,12 @@ test.describe('CP-005: Registro de pago y recibo autonumerado', () => {
     await page.locator('#Email').fill('cliente.pago@example.com');
     await page.locator('#Calle').fill('Av. Siempre Viva');
     await page.locator('#Numero').fill('742');
-    await page.locator('#ddlProvincia').selectOption({ label: 'Catamarca' }); // ⚠️ ajustar a tus datos reales
-    await page.waitForResponse(res => res.url().includes('/Clientes/GetLocalidades') && res.status() === 200);
+
+    await Promise.all([
+    page.waitForResponse(res => res.url().includes('/Clientes/GetLocalidades') && res.status() === 200),
+    page.locator('#ddlProvincia').selectOption({ label: 'Catamarca' }),
+    ]);
+
     await page.locator('#ddlLocalidad').selectOption({ label: 'San Fernando del Valle de Catamarca' }); // ⚠️ ajustar
     await page.locator('#ConsentimientoDatos').check();
     await page.locator('button[type="submit"]', { hasText: 'Guardar' }).click();

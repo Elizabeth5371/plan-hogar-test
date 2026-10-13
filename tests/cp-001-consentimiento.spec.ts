@@ -36,12 +36,14 @@ test.describe('CP-001: Consentimiento obligatorio en Alta de Cliente', () => {
     await page.locator('#Calle').fill('Av. Siempre Viva');
     await page.locator('#Numero').fill('742');
  
-    // ⚠️ Ajustar estas opciones a los valores reales seedeados en tu BD
-    await page.locator('#ddlProvincia').selectOption({ label: 'Catamarca' });
-    // Esperamos a que el fetch de GetLocalidades complete y cargue el combo
-    await page.waitForResponse(res => res.url().includes('/Clientes/GetLocalidades') && res.status() === 200);
+    
+     // Esperamos a que el fetch de GetLocalidades complete y cargue el combo
+    await Promise.all([
+      page.waitForResponse(res => res.url().includes('/Clientes/GetLocalidades') && res.status() === 200),
+      page.locator('#ddlProvincia').selectOption({ label: 'Catamarca' }),
+    ]);
+
     await page.locator('#ddlLocalidad').selectOption({ label: 'San Fernando del Valle de Catamarca' });
- 
     // 2. Dejar el checkbox de consentimiento SIN marcar
     const checkbox = page.locator('#ConsentimientoDatos');
     await expect(checkbox).not.toBeChecked();

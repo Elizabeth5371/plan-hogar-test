@@ -13,7 +13,7 @@ test.describe('CP-003: Búsqueda no recupera datos de clientes anonimizados', ()
   test('no devuelve resultados al buscar el DNI o apellido de un cliente ya anonimizado', async ({ page }) => {
     const sufijo = `${Date.now().toString().slice(-6)}${test.info().parallelIndex}`;
     const dniUnico = `30${sufijo}`;
-    const apellidoOriginal = `BuscarTest${test.info().parallelIndex}`;
+    const apellidoOriginal = `BuscarTest${sufijo}`;
     const nombreOriginal = 'Cliente Busqueda';
 
     // --- Login ---
@@ -32,8 +32,13 @@ test.describe('CP-003: Búsqueda no recupera datos de clientes anonimizados', ()
     await page.locator('#Email').fill('cliente.busqueda@example.com');
     await page.locator('#Calle').fill('Av. Siempre Viva');
     await page.locator('#Numero').fill('742');
-    await page.locator('#ddlProvincia').selectOption({ label: 'Catamarca' }); // ⚠️ ajustar a tus datos reales
-    await page.waitForResponse(res => res.url().includes('/Clientes/GetLocalidades') && res.status() === 200);
+
+    await Promise.all([
+    page.waitForResponse(res => res.url().includes('/Clientes/GetLocalidades') && res.status() === 200),
+    page.locator('#ddlProvincia').selectOption({ label: 'Catamarca' }),
+    ]);
+
+
     await page.locator('#ddlLocalidad').selectOption({ label: 'San Fernando del Valle de Catamarca' }); // ⚠️ ajustar
     await page.locator('#ConsentimientoDatos').check();
     await page.locator('button[type="submit"]', { hasText: 'Guardar' }).click();

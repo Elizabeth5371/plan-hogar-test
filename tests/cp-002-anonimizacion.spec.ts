@@ -19,7 +19,7 @@ test.describe('CP-002: Anonimización de datos en baja de cliente', () => {
     // paralelo, nunca generen el mismo DNI ni el mismo apellido al mismo tiempo.
     const sufijo = `${Date.now().toString().slice(-6)}${test.info().parallelIndex}`;
     const dniUnico = `30${sufijo}`;
-    const apellidoOriginal = `FernandezTest${test.info().parallelIndex}`;
+    const apellidoOriginal = `FernandezTest${sufijo}`; // ahora único
     const nombreOriginal = 'Cliente Baja';
 
     // --- Login ---
@@ -39,8 +39,8 @@ test.describe('CP-002: Anonimización de datos en baja de cliente', () => {
     await page.locator('#Calle').fill('Av. Siempre Viva');
     await page.locator('#Numero').fill('742');
     await Promise.all([
-    page.waitForResponse(res => res.url().includes('/Clientes/GetLocalidades') && res.status() === 200),
-    page.locator('#ddlProvincia').selectOption({ label: 'Catamarca' }),
+      page.waitForResponse(res => res.url().includes('/Clientes/GetLocalidades') && res.status() === 200),
+      page.locator('#ddlProvincia').selectOption({ label: 'Catamarca' }),
     ]);
     await page.locator('#ddlLocalidad').selectOption({ label: 'San Fernando del Valle de Catamarca' }); // ⚠️ ajustar
     await page.locator('#ConsentimientoDatos').check();
@@ -74,8 +74,12 @@ test.describe('CP-002: Anonimización de datos en baja de cliente', () => {
     await expect(page).toHaveURL(/.*Clientes\/Index/i);
 
     // --- El cliente ya no debe aparecer en el listado (Index filtra Anonimizado = true) ---
+    // Esperar explícitamente que la fila con el DNI único desaparezca (evita race condition)
+    await expect(page.locator('tr', { hasText: dniUnico })).toHaveCount(0, { timeout: 10_000 });
+
+    // Comprobaciones extra por seguridad
     await expect(page.locator('table')).not.toContainText(dniUnico);
-    await expect(page.locator('table')).not.toContainText(apellidoOriginal);
+    await expect(page.locator('table')).not.toContainText(apellidoOriginal, { timeout: 10_000 });
 
     // --- Verificar que los datos se sobreescribieron realmente en la base ---
     // (Editar no filtra por Anonimizado, así que sirve como comprobación indirecta)

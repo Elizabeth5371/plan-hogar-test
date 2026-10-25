@@ -15,7 +15,7 @@ test.describe('CP-001: Consentimiento obligatorio en Alta de Cliente', () => {
     // Login (reutiliza el flujo del Sprint 1)
     await page.goto('https://localhost:7250/');
     await page.getByRole('textbox', { name: 'Usuario' }).fill('admin@avalos.com');
-    await page.getByRole('textbox', { name: 'Contraseña' }).fill('admin123');
+    await page.getByRole('textbox', { name: 'Contraseña' }).fill('Admin123');
     await page.getByRole('button', { name: 'Iniciar Sesión' }).click();
     await expect(page).toHaveURL(/.*dashboard/i);
  

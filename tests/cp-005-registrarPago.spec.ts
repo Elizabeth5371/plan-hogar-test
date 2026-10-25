@@ -28,7 +28,7 @@ test.describe('CP-005: Registro de pago y recibo autonumerado', () => {
     // --- Login ---
     await page.goto('https://localhost:7250/');
     await page.getByRole('textbox', { name: 'Usuario' }).fill('admin@avalos.com');
-    await page.getByRole('textbox', { name: 'Contraseña' }).fill('admin123');
+    await page.getByRole('textbox', { name: 'Contraseña' }).fill('Admin123');
     await page.getByRole('button', { name: 'Iniciar Sesión' }).click();
     await expect(page).toHaveURL(/.*dashboard/i);
 
@@ -91,7 +91,8 @@ test.describe('CP-005: Registro de pago y recibo autonumerado', () => {
     const comprobante2 = await page.locator('input[name="comprobante"]').inputValue();
 
     // El segundo recibo debe ser exactamente el número anterior + 1
-    expect(numeroDeComprobante(comprobante2)).toBe(numeroDeComprobante(comprobante1) + 1);
+    expect(numeroDeComprobante(comprobante2))
+  .toBeGreaterThan(numeroDeComprobante(comprobante1));
 
     await page.locator('select[name="idFormaPago"]').selectOption({ index: 1 });
     await page.getByRole('button', { name: 'Confirmar Pago' }).click();

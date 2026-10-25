@@ -6,7 +6,7 @@ test('login exitoso', async ({ page }) => {
 
   // 2. Completar credenciales y presionar el botón
   await page.getByRole('textbox', { name: 'Usuario' }).fill('admin@avalos.com');
-  await page.getByRole('textbox', { name: 'Contraseña' }).fill('admin123');
+  await page.getByRole('textbox', { name: 'Contraseña' }).fill('Admin123');
   await page.getByRole('button', { name: 'Iniciar Sesión' }).click();
 
   // 3. Aserción de validación (Asegura que el test pase realmente)

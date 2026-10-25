@@ -50,7 +50,7 @@ test.describe('CP-007: Bloqueo de DNI duplicado en Alta de Cliente', () => {
     // --- Login ---
     await page.goto(`${BASE_URL}/`);
     await page.getByRole('textbox', { name: 'Usuario' }).fill('admin@avalos.com');
-    await page.getByRole('textbox', { name: 'Contraseña' }).fill('admin123');
+    await page.getByRole('textbox', { name: 'Contraseña' }).fill('Admin123');
     await page.getByRole('button', { name: 'Iniciar Sesión' }).click();
     await expect(page).toHaveURL(/.*dashboard/i);
  

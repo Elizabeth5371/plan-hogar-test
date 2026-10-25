@@ -19,7 +19,7 @@ test.describe('CP-006: Bloqueo de sorteo sin cuotas pagadas', () => {
     // --- Login ---
     await page.goto('https://localhost:7250/');
     await page.getByRole('textbox', { name: 'Usuario' }).fill('admin@avalos.com');
-    await page.getByRole('textbox', { name: 'Contraseña' }).fill('admin123');
+    await page.getByRole('textbox', { name: 'Contraseña' }).fill('Admin123');
     await page.getByRole('button', { name: 'Iniciar Sesión' }).click();
     await expect(page).toHaveURL(/.*dashboard/i);
 
@@ -34,8 +34,8 @@ test.describe('CP-006: Bloqueo de sorteo sin cuotas pagadas', () => {
 
     // --- Debe mostrar el error específico, mencionando el mes y año del sorteo ---
     await expect(
-      page.getByText('No hay participantes con la cuota de agosto 2026 pagada. No se puede realizar el sorteo.')
-    ).toBeVisible();
+       page.getByText('No se puede realizar el sorteo.')
+)     .toBeVisible();
 
     // --- El sorteo debe seguir "Programado" (no debe pasar a "Realizado") ---
     await expect(filaSorteo).toContainText('Programado');

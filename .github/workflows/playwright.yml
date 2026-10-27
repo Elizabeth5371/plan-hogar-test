@@ -42,10 +42,12 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y mysql-client
 
       - name: Importar dump a MySQL
-       
         run: |
-            mysql -h 127.0.0.1 -uroot -p"${{ secrets.DB_PASSWORD }}" combos_empresaAvalos < app/Dump20261005.sql
+          sed 's/combos_empresaavalos/combos_empresaAvalos/Ig' app/Dump20261025.sql | mysql -h 127.0.0.1 -uroot -p"${{ secrets.DB_PASSWORD }}" combos_empresaAvalos
 
+      - name: Verificar base de datos
+        run: |
+          mysql -h 127.0.0.1 -uroot -p"${{ secrets.DB_PASSWORD }}" -e "SELECT table_schema, COUNT(*) AS tablas FROM information_schema.tables WHERE table_schema LIKE 'combos%' GROUP BY table_schema;"
       - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
         with:
@@ -88,6 +90,12 @@ jobs:
 
       - name: Correr tests
         run: npx playwright test --workers=1
+
+      - name: Mostrar log de la app si falló
+        if: failure()
+        run: cat app.log
+
+
 
       - name: Subir reporte
         if: always()

@@ -16,12 +16,13 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: developer
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
           MYSQL_DATABASE: combos_empresaAvalos
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping -h localhost -pdevsoft"
+          --health-cmd="mysqladmin ping -h 127.0.0.1 --silent"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=10
@@ -41,8 +42,9 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y mysql-client
 
       - name: Importar dump a MySQL
+       
         run: |
-          mysql -h 127.0.0.1 -uroot -pdeveloper combos_empresaAvalos < app/Dump20261005.sql
+            mysql -h 127.0.0.1 -uroot -p"${{ secrets.DB_PASSWORD }}" combos_empresaAvalos < app/Dump20261005.sql
 
       - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
@@ -53,7 +55,7 @@ jobs:
         working-directory: app/ProyectoGestorVentaPH
         env:
           ASPNETCORE_URLS: https://localhost:7250
-          ConnectionStrings__DefaultConnection: "Server=127.0.0.1;Port=3306;Database=combos_empresaAvalos;User=root;Password=developer;Connection Timeout=30;"
+          ConnectionStrings__DefaultConnection: "Server=127.0.0.1;Port=3306;Database=combos_empresaAvalos;User=root;Password=${{ secrets.DB_PASSWORD }};Connection Timeout=30;"
           EmailSettings__AppPassword: "dummy-no-enviar"
         run: |
           dotnet dev-certs https
@@ -85,7 +87,7 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Correr tests
-        run: npx playwright test
+        run: npx playwright test --workers=1
 
       - name: Subir reporte
         if: always()

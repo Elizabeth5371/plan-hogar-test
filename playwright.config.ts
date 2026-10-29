@@ -11,10 +11,10 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
 
   /* Reintentos: solo en CI */
-  retries: process.env.CI ? 1 : 0,
+  retries: process.env.CI ? 2 : 1,
 
   /* Workers: uno solo en CI */
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? 2 : 6,
 
   /* Reporte HTML (el que se abre en localhost:9323) */
   reporter: [['list'], ['html', { open: 'never' }]],
@@ -33,7 +33,11 @@ export default defineConfig({
     screenshot: 'only-on-failure',
         /* Video: en CI solo cuando el test falla; en local, siempre */
     video: process.env.CI ? 'retain-on-failure' : 'on',
-    launchOptions: { slowMo: process.env.CI ? 0 : 100 }, // pausa solo en tu compu
+
+    navigationTimeout: 30000,   // 30 segundos para navegar
+    actionTimeout: 15000,       // 15 segundos para acciones
+
+    launchOptions: { slowMo: 0 }, // pausa solo en tu compu
     
   },
 

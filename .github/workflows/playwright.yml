@@ -17,11 +17,13 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
           MYSQL_DATABASE: combos_empresaAvalos
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping -h localhost -uroot -p$MYSQL_ROOT_PASSWORD"
+          --health-cmd="mysqladmin ping -h 127.0.0.1 --silent"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=10
@@ -42,8 +44,11 @@ jobs:
 
       - name: Importar dump a MySQL
         run: |
-          mysql -h 127.0.0.1 -uroot -p${{ secrets.DB_PASSWORD }} combos_empresaAvalos < app/Dump20261005.sql
+          sed 's/combos_empresaavalos/combos_empresaAvalos/Ig' app/Dump20261025.sql | mysql -h 127.0.0.1 -uroot -p"${{ secrets.DB_PASSWORD }}" combos_empresaAvalos
 
+      - name: Verificar base de datos
+        run: |
+          mysql -h 127.0.0.1 -uroot -p"${{ secrets.DB_PASSWORD }}" -e "SELECT table_schema, COUNT(*) AS tablas FROM information_schema.tables WHERE table_schema LIKE 'combos%' GROUP BY table_schema;"
       - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
         with:
@@ -85,7 +90,13 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Correr tests
-        run: npx playwright test
+        run: npx playwright test --workers=1
+
+      - name: Mostrar log de la app si falló
+        if: failure()
+        run: cat app.log
+
+
 
       - name: Subir reporte
         if: always()

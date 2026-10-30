@@ -18,7 +18,7 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
-          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
+         
           MYSQL_DATABASE: combos_empresaAvalos
         ports:
           - 3306:3306
